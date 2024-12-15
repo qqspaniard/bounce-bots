@@ -13,5 +13,6 @@ COPY backend/package*.json ./backend/
 RUN cd backend && npm install
 COPY backend ./backend
 COPY --from=build /app/frontend/dist ./frontend/dist
+RUN npm build
 EXPOSE 3000
-CMD ["npx", "ts-node", "backend/src/server.ts"]
+CMD ["npm", "start"]
