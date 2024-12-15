@@ -1,5 +1,11 @@
 {
   "files": [],
+  "compilerOptions": {
+    "rootDir": "./",
+    "paths": {
+      "@common/*": ["../common/*"]
+    }
+  },
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }

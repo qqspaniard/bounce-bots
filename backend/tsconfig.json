@@ -3,11 +3,14 @@
     "target": "ES6",
     "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "@common/*": ["../common/*"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../common/**/*.ts"],
   "exclude": ["node_modules"]
 }
