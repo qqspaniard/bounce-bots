@@ -19,10 +19,10 @@ const colorRobots = {
 };
 
 function App() {
-  const [blueBotCoord] = useState({ x: 5, y: 8 });
-  const [yellowBotCoord] = useState({ x: 9, y: 2 });
-  const [redBotCoord] = useState({ x: 4, y: 10 });
-  const [greenBotCoord] = useState({ x: 15, y: 15 });
+  const [blueBotCoord] = useState(Math.floor(Math.random() * 255));
+  const [yellowBotCoord] = useState(Math.floor(Math.random() * 255));
+  const [redBotCoord] = useState(Math.floor(Math.random() * 255));
+  const [greenBotCoord] = useState(Math.floor(Math.random() * 255));
 
   return (
     <body
@@ -129,7 +129,7 @@ function App() {
                 coord: greenBotCoord
               }
             ].map(({ robot, coord }) =>
-              coord.x === x && coord.y === y ? (
+              coord === id ? (
                 <div
                   style={{
                     boxShadow: '2px 2px 4px #CBC7D8',
@@ -138,7 +138,7 @@ function App() {
                     width: 30,
                     borderRadius: 30,
                     position: 'absolute',
-                    zIndex: 999
+                    zIndex: 9999
                   }}
                 />
               ) : undefined
