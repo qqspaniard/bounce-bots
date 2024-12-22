@@ -3,7 +3,6 @@ import path from "path";
 import dotenv from "dotenv";
 import apiRoutes from "./routes/api";
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
