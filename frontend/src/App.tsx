@@ -1,31 +1,50 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  RobotColor,
-  wallsHorizontal,
-  wallsVertical,
-  cellGrid
-} from './make-board';
+  Puzzle,
+  Direction,
+  Cell,
+  Bot,
+  Goal
+} from '../../common/types/interfaces';
 
 const wallWidth = 5;
-const wallHug = 2;
 const colorWall = '#ff00ee';
 const colorCellBackground = '#fff0f7';
-const colorCenterIsland = '#ff00ee';
-const colorRobots = {
-  [RobotColor.YELLOW]: '#aa00ff',
-  [RobotColor.BLUE]: '#00aaff',
-  [RobotColor.RED]: '#ff0066',
-  [RobotColor.GREEN]: '#ff6600'
+
+const botColorMap = {
+  '0': '#ff0066',
+  '1': '#ff4500',
+  '2': '#32cd32',
+  '3': '#1e90ff'
 };
 
 function App() {
-  const [blueBotCoord] = useState(Math.floor(Math.random() * 255));
-  const [yellowBotCoord] = useState(Math.floor(Math.random() * 255));
-  const [redBotCoord] = useState(Math.floor(Math.random() * 255));
-  const [greenBotCoord] = useState(Math.floor(Math.random() * 255));
+  const [cells, setCells] = useState<Record<string, Cell<Direction>>>();
+  const [bots, setBots] = useState<Record<string, Bot>>();
+  const [goals, setGoals] = useState<Goal[]>();
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/puzzles/daily')
+      .then((response) => response.json())
+      .then((res: Puzzle<Direction>) => {
+        console.log(res);
+        setCells(res.cells);
+        setGoals(res.goals);
+
+        // waiting on bots from API
+        // setBots(res.bots);
+        setBots({
+          '5,5': {
+            cell_id: '5,5',
+            id: '2'
+          }
+        });
+      })
+      .catch((error) => console.error(error));
+  }, []);
 
   return (
-    <body
+    <div
       style={{
         padding: 20,
         minWidth: 'min-content',
@@ -38,115 +57,99 @@ function App() {
           display: 'grid',
           gridTemplateRows: 'repeat(16, 50px)',
           gridTemplateColumns: 'repeat(16, 50px)',
-          gap: 2
+          gap: 1,
+          width: 'min-content',
+          position: 'relative'
         }}
       >
-        <div
-          style={{
-            boxShadow: '2px 2px 4px #CBC7D8',
-            background: colorCellBackground,
-            border: `${wallWidth}px solid ${colorCenterIsland}`,
-            gridColumn: '8 / 10',
-            gridRow: '8 / 10',
-            fontSize: 80,
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 999
-          }}
-        >
-          🦄
-        </div>
-        {cellGrid.map(({ id, coord: { x, y }, goal }) => (
-          <div
-            key={id}
-            style={{
-              background: colorCellBackground,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative'
-            }}
-          >
-            {goal === null ? (
-              <>
-                {/* {x},{y} */}
-                {id}
-              </>
-            ) : (
+        {goals &&
+          goals.map(({ bot_id, cell_id }) => {
+            const [col, row] = cell_id.split(',');
+            return (
               <div
+                key={bot_id}
                 style={{
-                  textShadow: '2px 2px 4px #CBC7D8',
-                  fontSize: 40,
-                  color: colorRobots[goal] || 'black'
+                  position: 'absolute',
+                  gridRow: 16 - parseInt(row),
+                  gridColumn: parseInt(col) + 1,
+                  zIndex: 999,
+                  backgroundColor: botColorMap[bot_id],
+                  margin: 5,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 40,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: 25
                 }}
               >
-                ✰
+                🦄
               </div>
-            )}
-            {wallsHorizontal[id] && (
+            );
+          })}
+        {bots &&
+          Object.values(bots).map(({ cell_id, id }) => {
+            const [col, row] = cell_id.split(',');
+            return (
               <div
+                key={id}
                 style={{
-                  boxShadow: '4px 0px 3px #CBC7D8',
-                  boxSizing: 'border-box',
                   position: 'absolute',
-                  height: `calc(100% + ${2 * (wallWidth - wallHug)}px)`,
-                  width: 0,
-                  right: -(wallWidth - wallHug),
-                  borderRight: `${wallWidth}px solid ${colorWall}`,
-                  zIndex: 99
+                  gridRow: 16 - parseInt(row),
+                  gridColumn: parseInt(col) + 1,
+                  zIndex: 999,
+                  backgroundColor: botColorMap[id],
+                  margin: 5,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 40,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: 25
                 }}
-              />
-            )}
-            {wallsVertical[id] && (
+              >
+                🤖
+              </div>
+            );
+          })}
+        {cells &&
+          Object.values(cells).map(({ id, neighbors }) => {
+            const [, row] = id.split(',');
+            return (
               <div
+                key={id}
                 style={{
-                  boxShadow: '3px 3px 2px #CBC7D8',
-                  boxSizing: 'border-box',
-                  position: 'absolute',
-                  height: 0,
-                  width: `calc(100% + ${2 * (wallWidth - wallHug)}px)`,
-                  bottom: -(wallWidth - wallHug),
-                  borderBottom: `${wallWidth}px solid ${colorWall}`,
-                  zIndex: 100
+                  fontSize: 8,
+                  fontFamily: 'monospace',
+                  color: '#333',
+                  backgroundColor: colorCellBackground,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  gridRow: 16 - parseInt(row),
+                  borderRight: neighbors.east
+                    ? undefined
+                    : `${wallWidth}px solid ${colorWall}`,
+                  borderBottom: neighbors.south
+                    ? undefined
+                    : `${wallWidth}px solid ${colorWall}`,
+                  borderLeft: neighbors.west
+                    ? undefined
+                    : `${wallWidth}px solid ${colorWall}`,
+                  borderTop: neighbors.north
+                    ? undefined
+                    : `${wallWidth}px solid ${colorWall}`
                 }}
-              />
-            )}
-            {[
-              {
-                robot: RobotColor.BLUE,
-                coord: blueBotCoord
-              },
-              {
-                robot: RobotColor.YELLOW,
-                coord: yellowBotCoord
-              },
-              {
-                robot: RobotColor.RED,
-                coord: redBotCoord
-              },
-              {
-                robot: RobotColor.GREEN,
-                coord: greenBotCoord
-              }
-            ].map(({ robot, coord }) =>
-              coord === id ? (
-                <div
-                  style={{
-                    boxShadow: '2px 2px 4px #CBC7D8',
-                    background: colorRobots[robot],
-                    height: 30,
-                    width: 30,
-                    borderRadius: 30,
-                    position: 'absolute',
-                    zIndex: 9999
-                  }}
-                />
-              ) : undefined
-            )}
-          </div>
-        ))}
+              >
+                {id}
+              </div>
+            );
+          })}
       </div>
-    </body>
+    </div>
   );
 }
 
