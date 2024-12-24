@@ -1,33 +1,28 @@
-# Step 1: Build the React frontend
-FROM node:22 AS build_frontend
+# Step 1: Transpile to JS
+FROM node:22 AS build
 WORKDIR /app
 COPY package*.json .
-COPY common/package*.json ./common/
-COPY frontend/package*.json ./frontend/
-RUN npm install
-COPY common ./common
-COPY frontend ./frontend
-RUN npm run build -w frontend
-
-# Step 2: Build the backend
-FROM node:22 AS build_backend
-WORKDIR /app
-COPY package*.json .
+COPY tsconfig.json .
+COPY tsconfig.base.json .
 COPY common/package*.json ./common/
 COPY backend/package*.json ./backend/
+COPY frontend/package*.json ./frontend/
 RUN npm install
-COPY common ./common
 COPY backend ./backend
-RUN npm run build -w backend
+COPY common ./common
+COPY frontend ./frontend
+RUN npm run build -ws
 
-# Step 3: Build final image
+# Step 2: Build final image
 FROM node:22
 WORKDIR /app
 COPY package*.json .
 COPY common/package*.json ./common/
 COPY backend/package*.json ./backend/
+COPY frontend/package*.json ./frontend/
 RUN npm install
-COPY --from=build_frontend /app/frontend/dist ./frontend/dist
-COPY --from=build_backend /app/backend/dist ./
-CMD ["node", "backend/src/server.js"]
+COPY --from=build /app/frontend/dist ./frontend/dist
+COPY --from=build /app/common/dist ./common/dist
+COPY --from=build /app/backend/dist ./backend/dist
+CMD ["node", "backend/dist/server.js"]
 
