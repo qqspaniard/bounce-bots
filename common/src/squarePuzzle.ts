@@ -63,7 +63,7 @@ export const generateRandomPuzzle = (
   );
 
   // Generate Goals
-  const goals: Goal[] = [...Array(nGoals).keys()].map((id) => ({
+  const goals: Goal[] = [...Array(nGoals).keys()].map(() => ({
     bot_id: String(randInt(nBots)),
     cell_id: _random_cell_id(xSize, ySize),
   }));

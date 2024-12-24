@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors())
+app.use(cors());
 
 // Backend Routes
 app.use("/api", apiRoutes);
@@ -17,7 +17,7 @@ app.use("/api", apiRoutes);
 // Serve the React frontend in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../../frontend/dist")));
-  app.get("*", (req: Request, res: Response) => {
+  app.get("*", (_: Request, res: Response) => {
     res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
   });
 } else {

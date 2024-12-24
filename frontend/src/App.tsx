@@ -1,32 +1,27 @@
-import { useEffect, useState } from 'react';
-import {
-  Puzzle,
-  Direction,
-  Cell,
-  Bot,
-  Goal
-} from '../../common/types/interfaces';
+import { useEffect, useState } from "react";
+import { Puzzle, Cell, Bot, Goal } from "@bounce-bots/common";
 
 const wallWidth = 5;
-const colorWall = '#ff00ee';
-const colorCellBackground = '#fff0f7';
+const colorWall = "#ff00ee";
+const colorCellBackground = "#fff0f7";
 
 const botColorMap = {
-  '0': '#ff0066',
-  '1': '#ff4500',
-  '2': '#32cd32',
-  '3': '#1e90ff'
+  "0": "#ff0066",
+  "1": "#ff4500",
+  "2": "#32cd32",
+  "3": "#1e90ff",
 };
+const defaultBotColor = "#eeeeee";
 
 function App() {
-  const [cells, setCells] = useState<Record<string, Cell<Direction>>>();
+  const [cells, setCells] = useState<Record<string, Cell>>();
   const [bots, setBots] = useState<Record<string, Bot>>();
   const [goals, setGoals] = useState<Goal[]>();
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/puzzles/daily')
+    fetch("http://localhost:3000/api/puzzles/daily")
       .then((response) => response.json())
-      .then((res: Puzzle<Direction>) => {
+      .then((res: Puzzle) => {
         console.log(res);
         setCells(res.cells);
         setGoals(res.goals);
@@ -34,10 +29,10 @@ function App() {
         // waiting on bots from API
         // setBots(res.bots);
         setBots({
-          '5,5': {
-            cell_id: '5,5',
-            id: '2'
-          }
+          "5,5": {
+            cell_id: "5,5",
+            id: "2",
+          },
         });
       })
       .catch((error) => console.error(error));
@@ -47,41 +42,43 @@ function App() {
     <div
       style={{
         padding: 20,
-        minWidth: 'min-content',
-        minHeight: 'min-content'
+        minWidth: "min-content",
+        minHeight: "min-content",
       }}
     >
       <h1>BounceBots ✰</h1>
       <div
         style={{
-          display: 'grid',
-          gridTemplateRows: 'repeat(16, 50px)',
-          gridTemplateColumns: 'repeat(16, 50px)',
+          display: "grid",
+          gridTemplateRows: "repeat(16, 50px)",
+          gridTemplateColumns: "repeat(16, 50px)",
           gap: 1,
-          width: 'min-content',
-          position: 'relative'
+          width: "min-content",
+          position: "relative",
         }}
       >
         {goals &&
           goals.map(({ bot_id, cell_id }) => {
-            const [col, row] = cell_id.split(',');
+            const [col, row] = cell_id.split(",");
             return (
               <div
                 key={bot_id}
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   gridRow: 16 - parseInt(row),
                   gridColumn: parseInt(col) + 1,
                   zIndex: 999,
-                  backgroundColor: botColorMap[bot_id],
+                  backgroundColor:
+                    botColorMap[bot_id as keyof typeof botColorMap] ||
+                    defaultBotColor,
                   margin: 5,
                   width: 40,
                   height: 40,
                   borderRadius: 40,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: 25
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontSize: 25,
                 }}
               >
                 🦄
@@ -90,24 +87,26 @@ function App() {
           })}
         {bots &&
           Object.values(bots).map(({ cell_id, id }) => {
-            const [col, row] = cell_id.split(',');
+            const [col, row] = cell_id.split(",");
             return (
               <div
                 key={id}
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   gridRow: 16 - parseInt(row),
                   gridColumn: parseInt(col) + 1,
                   zIndex: 999,
-                  backgroundColor: botColorMap[id],
+                  backgroundColor:
+                    botColorMap[id as keyof typeof botColorMap] ||
+                    defaultBotColor,
                   margin: 5,
                   width: 40,
                   height: 40,
                   borderRadius: 40,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: 25
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontSize: 25,
                 }}
               >
                 🤖
@@ -116,19 +115,19 @@ function App() {
           })}
         {cells &&
           Object.values(cells).map(({ id, neighbors }) => {
-            const [, row] = id.split(',');
+            const [, row] = id.split(",");
             return (
               <div
                 key={id}
                 style={{
                   fontSize: 8,
-                  fontFamily: 'monospace',
-                  color: '#333',
+                  fontFamily: "monospace",
+                  color: "#333",
                   backgroundColor: colorCellBackground,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
                   gridRow: 16 - parseInt(row),
                   borderRight: neighbors.east
                     ? undefined
@@ -141,7 +140,7 @@ function App() {
                     : `${wallWidth}px solid ${colorWall}`,
                   borderTop: neighbors.north
                     ? undefined
-                    : `${wallWidth}px solid ${colorWall}`
+                    : `${wallWidth}px solid ${colorWall}`,
                 }}
               >
                 {id}
