@@ -1,0 +1,75 @@
+.grid {
+  display: grid;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  outline: 6px solid #ff00ee;
+}
+
+.cell {
+  border: 0.5px solid white;
+  position: relative;
+  font-size: 8px;
+  font-family: monospace;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff0f7;
+}
+
+.wall {
+  border: 3px solid transparent;
+  content: '';
+  position: absolute;
+  inset: -0.5px;
+}
+
+.wall.north {
+  border-top-color: #ff00ee;
+}
+
+.wall.south {
+  border-bottom-color: #ff00ee;
+}
+
+.wall.east {
+  border-right-color: #ff00ee;
+}
+
+.wall.west {
+  border-left-color: #ff00ee;
+}
+
+.goal {
+  position: absolute;
+  font-size: 40px;
+  inset: 6px;
+  color: white;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.goal > span {
+  position: relative;
+  top: -4px;
+}
+
+.bot {
+  position: absolute;
+  inset: 6px;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  color: white;
+}
+
+.bot > span {
+  position: relative;
+  top: 1px;
+}

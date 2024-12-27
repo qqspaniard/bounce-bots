@@ -68,7 +68,7 @@ export const generateRandomPuzzle = (
   // Generate Bots
   const bots: Record<string, Bot> = Object.fromEntries(
     [...Array(nBots).keys()].map((id) => [
-      { id: { id: id, cell_id: _random_cell_id(xSize, ySize) } }
+      id, { id: id.toString(), cell_id: _random_cell_id(xSize, ySize) }
     ])
   );
 
@@ -95,8 +95,7 @@ const _set_wall = (
   } else if (direction === 'west') {
     cells[_coord_to_id(x, y)].neighbors.west = null;
     cells[_coord_to_id(x - 1, y)].neighbors.east = null;
-  } else {
-    // direction === "south"
+  } else { // direction === "south"
     cells[_coord_to_id(x, y)].neighbors.south = null;
     cells[_coord_to_id(x, y - 1)].neighbors.north = null;
   }

@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Puzzle, Cell, Goal } from '@bounce-bots/common';
-
-const wallWidth = 3;
-const cellPadding = 4;
-const colorWall = '#ff00ee';
-const colorCellBackground = '#fff0f7';
+import classnames from 'classnames';
+import { Puzzle, Cell, Bot, Goal } from '@bounce-bots/common';
 
 const botColorMap = {
   '0': '#ff0066',
@@ -16,6 +12,7 @@ const defaultBotColor = '#eeeeee';
 
 function App() {
   const [cells, setCells] = useState<Record<string, Cell>>();
+  const [bots, setBots] = useState<Record<string, Bot>>();
   const [goals, setGoals] = useState<Goal[]>();
 
   useEffect(() => {
@@ -25,6 +22,7 @@ function App() {
         console.log(res);
         setCells(res.cells);
         setGoals(res.goals);
+        setBots(res.bots);
       })
       .catch((error) => console.error(error));
   }, []);
@@ -39,80 +37,65 @@ function App() {
     >
       <h1>BounceBots ✰</h1>
       <div
+        className="grid"
         style={{
-          display: 'grid',
           gridTemplateRows: 'repeat(16, 6.25%)',
-          gridTemplateColumns: 'repeat(16, 6.25%)',
-          width: '100%',
-          maxWidth: 800,
-          aspectRatio: '1 / 1',
-          // gap: 1,
-          position: 'relative',
-          outline: `${wallWidth}px solid ${colorWall}`
+          gridTemplateColumns: 'repeat(16, 6.25%)'
         }}
       >
         {cells &&
           Object.values(cells).map(({ id, neighbors }) => {
             const [, row] = id.split(',');
             const goal = goals?.find((g) => g.cell_id === id);
+            const bot =
+              bots && Object.values(bots).find((b) => b.cell_id === id);
+            const hasWall = Object.values(neighbors).find((v) => !!v);
 
             return (
               <div
                 key={id}
+                className="cell"
                 style={{
-                  position: 'relative',
-                  fontSize: 8,
-                  fontFamily: 'monospace',
-                  color: '#333',
-                  backgroundColor: colorCellBackground,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gridRow: 16 - parseInt(row),
-                  borderRight: `${wallWidth}px solid ${
-                    neighbors.east ? 'transparent' : colorWall
-                  }`,
-                  borderBottom: `${wallWidth}px solid ${
-                    neighbors.south ? 'transparent' : colorWall
-                  }`,
-                  borderLeft: `${wallWidth}px solid ${
-                    neighbors.west ? 'transparent' : colorWall
-                  }`,
-                  borderTop: `${wallWidth}px solid ${
-                    neighbors.north ? 'transparent' : colorWall
-                  }`
+                  gridRow: 16 - parseInt(row)
                 }}
               >
-                {goal ? (
+                {hasWall && (
+                  <div
+                    className={classnames('wall', {
+                      north: !neighbors.north,
+                      east: !neighbors.east,
+                      south: !neighbors.south,
+                      west: !neighbors.west
+                    })}
+                  />
+                )}
+                {goal && (
                   <div
                     key={id}
+                    className="goal"
                     style={{
-                      position: 'absolute',
-                      zIndex: 999,
                       backgroundColor:
                         botColorMap[goal.bot_id as keyof typeof botColorMap] ||
-                        defaultBotColor,
-                      borderRadius: '100%',
-                      fontSize: 40,
-                      inset: cellPadding,
-                      color: 'white',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center'
+                        defaultBotColor
                     }}
                   >
-                    <span
-                      style={{
-                        position: 'relative',
-                        top: -3
-                      }}
-                    >
-                      ✰
-                    </span>
+                    <span>✰</span>
                   </div>
-                ) : (
-                  id
                 )}
+                {bot && (
+                  <div
+                    key={id}
+                    className="bot"
+                    style={{
+                      backgroundColor:
+                        botColorMap[bot.id as keyof typeof botColorMap] ||
+                        defaultBotColor
+                    }}
+                  >
+                    <span>®</span>
+                  </div>
+                )}
+                {id}
               </div>
             );
           })}
